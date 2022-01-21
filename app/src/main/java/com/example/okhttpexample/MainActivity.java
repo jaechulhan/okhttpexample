@@ -70,59 +70,5 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-        //new HttpAsyncTask(this).execute("http://dummy.restapiexample.com/api/v1/employees");
-    }
-
-    private static class HttpAsyncTask extends AsyncTask<String, Void, String> {
-        private static OkHttpClient client;
-
-        private final Context mContext;
-
-        public HttpAsyncTask(final Context context) {
-            mContext = context;
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            String result = null;
-            String url = strings[0];
-
-            ClearableCookieJar cookieJar =
-                    new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(mContext));
-
-            if (client == null) {
-                client = new OkHttpClient.Builder()
-                        .cookieJar(cookieJar)
-                        .build();
-            }
-
-            try {
-                Request request = new Request.Builder()
-                        .url(url)
-                        .build();
-                Response response = client.newCall(request).execute();
-                result = response.body().string();
-
-                // JSON Parser with GSON - JSON to Map Class
-                Gson gson = new Gson();
-                Map map = gson.fromJson(result, Map.class);
-
-                // Logging
-                Log.d(TAG, "doInBackground: " + map.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (s != null) {
-                Log.d(TAG, "onPostExecute: " + s);
-            }
-        }
-
     }
 }
