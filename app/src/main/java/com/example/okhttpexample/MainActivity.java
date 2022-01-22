@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
                 .url("http://dummy.restapiexample.com/api/v1/employees")
                 .build();
 
+        Log.d(TAG, "BASE_URL: " + BuildConfig.BASE_URL);
+
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

@@ -15,8 +15,22 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
+    signingConfigs {
         release {
+            storeFile file("app-release-key.keystore")
+            storePassword 'prolancer123!@#'
+            keyAlias 'prolancer_net'
+            keyPassword 'prolancer123!@#'
+        }
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField "String", "BASE_URL", '"https://dev-api.prolancer.com"'
+        }
+        release {
+            buildConfigField "String", "BASE_URL", '"https://api.prolancer.com"'
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
