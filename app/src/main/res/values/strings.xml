@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Okhttp Example</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="signup">Sign-Up</string>
+    <string name="fullname">Fullname</string>
+    <string name="email">Email</string>
+    <string name="already_have_an_account_login">Already have an account? <u>Login</u></string>
+    <string name="create_a_new_account_sign_up">Create a new account? <u>Sign-up</u></string>
 </resources>
