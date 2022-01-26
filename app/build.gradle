@@ -26,7 +26,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField "String", "BASE_URL", '"https://dev-api.prolancer.com"'
+            buildConfigField "String", "BASE_URL", '"http://192.168.1.246:48080"'
         }
         release {
             buildConfigField "String", "BASE_URL", '"https://api.prolancer.com"'

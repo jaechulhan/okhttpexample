@@ -35,7 +35,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableRight="@drawable/ic_fullname"
-            android:fontFamily="@font/poppinsmedium" />
+            android:fontFamily="@font/poppinsmedium"
+            android:singleLine="true" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -56,7 +57,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableRight="@drawable/ic_email"
-            android:fontFamily="@font/poppinsmedium" />
+            android:fontFamily="@font/poppinsmedium"
+            android:singleLine="true" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -77,7 +79,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableRight="@drawable/ic_user"
-            android:fontFamily="@font/poppinsmedium" />
+            android:fontFamily="@font/poppinsmedium"
+            android:singleLine="true" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -98,7 +101,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableRight="@drawable/ic_password"
-            android:fontFamily="@font/poppinsmedium" />
+            android:fontFamily="@font/poppinsmedium"
+            android:password="true"
+            android:singleLine="true" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
