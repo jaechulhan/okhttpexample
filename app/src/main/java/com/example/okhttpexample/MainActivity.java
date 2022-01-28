@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         OkHttpClient client = NetworkManager.getInstance(this).getClient();
 
         Request request = new Request.Builder()
-                .url("http://dummy.restapiexample.com/api/v1/employees")
+                .url(BuildConfig.BASE_URL + "/rest/v1/user/info?username=admin")
                 .build();
 
         Log.d(TAG, "BASE_URL: " + BuildConfig.BASE_URL);

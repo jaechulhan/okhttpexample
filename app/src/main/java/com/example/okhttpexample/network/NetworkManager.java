@@ -2,6 +2,10 @@ package com.example.okhttpexample.network;
 
 import android.content.Context;
 
+import com.example.okhttpexample.network.interceptor.AuthTokenInterceptor;
+import com.example.okhttpexample.network.interceptor.CacheInterceptor;
+import com.example.okhttpexample.network.interceptor.ErrorInterceptor;
+import com.example.okhttpexample.network.interceptor.ForceCacheInterceptor;
 import com.franmontiel.persistentcookiejar.ClearableCookieJar;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
@@ -33,6 +37,12 @@ public class NetworkManager {
         builder.followRedirects(true);
         builder.addInterceptor(httpLoggingInterceptor);
         builder.addNetworkInterceptor(httpLoggingInterceptor);
+
+        // Custom Interceptor
+        builder.addInterceptor(new ErrorInterceptor());
+        builder.addInterceptor(new ForceCacheInterceptor());
+        builder.addInterceptor(new AuthTokenInterceptor(context));
+        builder.addNetworkInterceptor(new CacheInterceptor()); // only if not enabled from the server
 
         File cacheDir = new File(context.getCacheDir(), "network");
 

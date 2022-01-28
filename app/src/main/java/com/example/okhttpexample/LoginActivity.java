@@ -2,7 +2,11 @@ package com.example.okhttpexample;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -89,13 +93,16 @@ public class LoginActivity extends AppCompatActivity {
                             final String result = response.body().string();
                             Gson gson = new Gson();
                             Map map = gson.fromJson(result, Map.class);
+                            Log.d(TAG, "onResponse: " + map.toString());
 
-                            LoginActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Log.d(TAG, "onResponse: " + map.toString());
-                                }
-                            });
+                            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.putString("access_token",(String) map.get("access_token"));
+                            editor.apply();
+
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
                         }
                     }
                 });
