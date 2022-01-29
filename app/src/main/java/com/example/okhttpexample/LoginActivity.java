@@ -1,32 +1,28 @@
 package com.example.okhttpexample;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.okhttpexample.common.utils.AES256Utils;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.okhttpexample.common.constants.AppConstants;
+import com.example.okhttpexample.common.utils.PreferencesUtils;
 import com.example.okhttpexample.network.NetworkManager;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.text.Normalizer;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -69,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
                 String json = gson.toJson(reqMap);
 
                 RequestBody jsonBody = RequestBody.create(
-                        MediaType.parse("application/json"), json);
+                        MediaType.parse(AppConstants.JSON_CONTENT_TYPE), json);
 
                 // #2. Create request with post
                 String url = BuildConfig.BASE_URL + "/rest/v1/auth";
@@ -78,8 +74,6 @@ public class LoginActivity extends AppCompatActivity {
                         .url(url)
                         .post(jsonBody)
                         .build();
-
-                Log.d(TAG, "URL: " + url + ", REQUEST BODY: " + json);
 
                 client.newCall(request).enqueue(new Callback() {
                     @Override
@@ -95,10 +89,10 @@ public class LoginActivity extends AppCompatActivity {
                             Map map = gson.fromJson(result, Map.class);
                             Log.d(TAG, "onResponse: " + map.toString());
 
-                            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-                            SharedPreferences.Editor editor = preferences.edit();
-                            editor.putString("access_token",(String) map.get("access_token"));
-                            editor.apply();
+                            Map<String, String> sharedMap = new HashMap<String, String>();
+                            sharedMap.put(AppConstants.ACCESS_TOKEN_KEY, (String) map.get(AppConstants.ACCESS_TOKEN_KEY));
+                            sharedMap.put(AppConstants.REFRESH_TOKEN_KEY, (String) map.get(AppConstants.REFRESH_TOKEN_KEY));
+                            PreferencesUtils.setPreferences(LoginActivity.this, sharedMap);
 
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);

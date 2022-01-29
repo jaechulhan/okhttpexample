@@ -39,7 +39,7 @@ public class NetworkManager {
         builder.addNetworkInterceptor(httpLoggingInterceptor);
 
         // Custom Interceptor
-        builder.addInterceptor(new ErrorInterceptor());
+        builder.addInterceptor(new ErrorInterceptor(context));
         builder.addInterceptor(new ForceCacheInterceptor(context));
         builder.addInterceptor(new AuthTokenInterceptor(context));
         builder.addNetworkInterceptor(new CacheInterceptor()); // only if not enabled from the server
