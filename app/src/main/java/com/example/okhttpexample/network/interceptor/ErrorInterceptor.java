@@ -1,15 +1,11 @@
 package com.example.okhttpexample.network.interceptor;
 
 import android.content.Context;
-import android.content.Intent;
-import android.icu.text.IDNA;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.example.okhttpexample.BuildConfig;
-import com.example.okhttpexample.LoginActivity;
-import com.example.okhttpexample.MainActivity;
 import com.example.okhttpexample.common.constants.AppConstants;
 import com.example.okhttpexample.common.utils.PreferencesUtils;
 import com.example.okhttpexample.network.NetworkManager;
