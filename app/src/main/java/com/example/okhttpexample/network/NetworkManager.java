@@ -127,12 +127,10 @@ public class NetworkManager {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    final String result = response.body().string();
-                    Gson gson = new Gson();
-                    Map resMap = gson.fromJson(result, Map.class);
-                    networkResponseListener.onSuccess(resMap);
-                }
+                final String result = response.body().string();
+                Gson gson = new Gson();
+                Map resMap = gson.fromJson(result, Map.class);
+                networkResponseListener.onSuccess(resMap);
             }
         });
         // End - Call API

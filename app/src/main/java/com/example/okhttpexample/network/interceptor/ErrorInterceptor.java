@@ -23,7 +23,6 @@ public class ErrorInterceptor implements Interceptor {
     private static final String TAG = ErrorInterceptor.class.getSimpleName();
 
     private Context context;
-    private String accessToken;
 
     public ErrorInterceptor(Context context) {this.context = context;}
 

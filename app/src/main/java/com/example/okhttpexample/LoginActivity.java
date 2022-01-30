@@ -69,15 +69,19 @@ public class LoginActivity extends AppCompatActivity {
 
                         @Override
                         public void onSuccess(Map<String, Object> resMap) {
-                            // #1. Save Access Token / Refresh Token
-                            Map<String, String> sharedMap = new HashMap<String, String>();
-                            sharedMap.put(AppConstants.ACCESS_TOKEN_KEY, (String) resMap.get(AppConstants.ACCESS_TOKEN_KEY));
-                            sharedMap.put(AppConstants.REFRESH_TOKEN_KEY, (String) resMap.get(AppConstants.REFRESH_TOKEN_KEY));
-                            PreferencesUtils.setPreferences(LoginActivity.this, sharedMap);
-                            // #2. Move to MainActivity
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
+                            if (resMap.get("error") != null) {
+                                Log.e(TAG, "Login Error");
+                            } else {
+                                // #1. Save Access Token / Refresh Token
+                                Map<String, String> sharedMap = new HashMap<String, String>();
+                                sharedMap.put(AppConstants.ACCESS_TOKEN_KEY, (String) resMap.get(AppConstants.ACCESS_TOKEN_KEY));
+                                sharedMap.put(AppConstants.REFRESH_TOKEN_KEY, (String) resMap.get(AppConstants.REFRESH_TOKEN_KEY));
+                                PreferencesUtils.setPreferences(LoginActivity.this, sharedMap);
+                                // #2. Move to MainActivity
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
                             // #3. Close progressbar
                             runOnUiThread(new Runnable() {
                                 @Override
