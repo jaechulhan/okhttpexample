@@ -2,6 +2,8 @@ package com.example.okhttpexample.network;
 
 import android.content.Context;
 
+import com.example.okhttpexample.BuildConfig;
+import com.example.okhttpexample.common.constants.AppConstants;
 import com.example.okhttpexample.network.interceptor.AuthTokenInterceptor;
 import com.example.okhttpexample.network.interceptor.CacheInterceptor;
 import com.example.okhttpexample.network.interceptor.ErrorInterceptor;
@@ -10,12 +12,21 @@ import com.franmontiel.persistentcookiejar.ClearableCookieJar;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
+import com.google.gson.Gson;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 public class NetworkManager {
@@ -63,6 +74,7 @@ public class NetworkManager {
 
     /**
      * Get Instance of NetworkManager
+     *
      * @return
      */
     public static NetworkManager getInstance(Context context) {
@@ -74,9 +86,55 @@ public class NetworkManager {
 
     /**
      * Get OkHttpClient
+     *
      * @return
      */
     public OkHttpClient getClient() {
         return client;
+    }
+
+    /**
+     * Call API
+     *
+     * @param context
+     * @param url
+     * @param reqBodyMap
+     * @param networkResponseListener
+     */
+    public static void sendToServer(Context context, String url, Map<String, String> reqBodyMap, final NetworkResponseListener networkResponseListener) {
+        // Start - Call API
+        OkHttpClient client = NetworkManager.getInstance(context).getClient();
+
+        Gson gson = new Gson();
+        String json = gson.toJson(reqBodyMap);
+
+        RequestBody jsonBody = RequestBody.create(
+                MediaType.parse(AppConstants.JSON_CONTENT_TYPE), json);
+
+        // #2. Create request with post
+        url = BuildConfig.BASE_URL + url;
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(jsonBody)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                networkResponseListener.onFailure(e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    final String result = response.body().string();
+                    Gson gson = new Gson();
+                    Map resMap = gson.fromJson(result, Map.class);
+                    networkResponseListener.onSuccess(resMap);
+                }
+            }
+        });
+        // End - Call API
     }
 }

@@ -5,24 +5,18 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.okhttpexample.BuildConfig;
 import com.example.okhttpexample.common.constants.AppConstants;
 import com.example.okhttpexample.common.utils.PreferencesUtils;
 import com.example.okhttpexample.network.NetworkManager;
-import com.google.gson.Gson;
+import com.example.okhttpexample.network.NetworkResponseListener;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Interceptor;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class ErrorInterceptor implements Interceptor {
@@ -67,53 +61,31 @@ public class ErrorInterceptor implements Interceptor {
      * @param context
      * @throws IOException
      */
-    private void refreshToken(Context context) throws IOException{
-        // Start - Call API
-        OkHttpClient client = NetworkManager.getInstance(context).getClient();
-
+    private void refreshToken(Context context) throws IOException {
+        // #1. Generate request message with Json
         String refreshToken = PreferencesUtils.getPreferences(context, AppConstants.REFRESH_TOKEN_KEY);
         if (refreshToken == null || refreshToken.equalsIgnoreCase("")) {
             throw new IOException("Refresh Token Error");
         }
 
-        // #1. Generate request message with Json
-        HashMap<String, Object> reqMap = new LinkedHashMap<>();
-        reqMap.put(AppConstants.REFRESH_TOKEN_KEY, refreshToken);
+        Map<String, String> reqBodyMap = new LinkedHashMap<>();
+        reqBodyMap.put(AppConstants.REFRESH_TOKEN_KEY, refreshToken);
 
-        Gson gson = new Gson();
-        String json = gson.toJson(reqMap);
-
-        RequestBody jsonBody = RequestBody.create(
-                MediaType.parse(AppConstants.JSON_CONTENT_TYPE), json);
-
-        // #2. Create request with post
-        String url = BuildConfig.BASE_URL + "/rest/v1/auth/refresh_token";
-
-        Request request = new Request.Builder()
-                .url(url)
-                .post(jsonBody)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
+        // #2. Call API
+        NetworkManager.sendToServer(context, "/rest/v1/auth/refresh_token", reqBodyMap, new NetworkResponseListener() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+            public void onFailure(Throwable throwable) {
+                Log.e(TAG, "Refresh Token Error");
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if(response.isSuccessful()){
-                    final String result = response.body().string();
-                    Gson gson = new Gson();
-                    Map map = gson.fromJson(result, Map.class);
-
-                    Map<String, String> sharedMap = new HashMap<String, String>();
-                    sharedMap.put(AppConstants.ACCESS_TOKEN_KEY, (String) map.get(AppConstants.ACCESS_TOKEN_KEY));
-                    sharedMap.put(AppConstants.REFRESH_TOKEN_KEY, (String) map.get(AppConstants.REFRESH_TOKEN_KEY));
-                    PreferencesUtils.setPreferences(context, sharedMap);
-                }
+            public void onSuccess(Map<String, Object> resMap) {
+                // #1. Save Access Token / Refresh Token
+                Map<String, String> sharedMap = new HashMap<String, String>();
+                sharedMap.put(AppConstants.ACCESS_TOKEN_KEY, (String) resMap.get(AppConstants.ACCESS_TOKEN_KEY));
+                sharedMap.put(AppConstants.REFRESH_TOKEN_KEY, (String) resMap.get(AppConstants.REFRESH_TOKEN_KEY));
+                PreferencesUtils.setPreferences(context, sharedMap);
             }
         });
-        // End - Call API
     }
 }

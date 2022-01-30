@@ -8,4 +8,5 @@
     <string name="email">Email</string>
     <string name="already_have_an_account_login">Already have an account? <u>Login</u></string>
     <string name="create_a_new_account_sign_up">Create a new account? <u>Sign-up</u></string>
+    <string name="required_field_error">%s is required.</string>
 </resources>

@@ -2,6 +2,7 @@ package com.example.okhttpexample;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,21 +14,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.okhttpexample.common.constants.AppConstants;
 import com.example.okhttpexample.common.utils.PreferencesUtils;
 import com.example.okhttpexample.network.NetworkManager;
+import com.example.okhttpexample.network.NetworkResponseListener;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.gson.Gson;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = LoginActivity.class.getSimpleName();
@@ -53,56 +45,67 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
 
-                // Start - Call API
-                OkHttpClient client = NetworkManager.getInstance(LoginActivity.this).getClient();
+                this.checkRequiredField();
 
-                // #1. Generate request message with Json
-                HashMap<String, Object> reqMap = new LinkedHashMap<>();
-                reqMap.put("username", tiUsername.getText().toString());
-                reqMap.put("password", tiPassword.getText().toString());
+                if (!TextUtils.isEmpty(tiUsername.getText()) && !TextUtils.isEmpty(tiPassword.getText())) {
+                    // #1. Generate request message with Json
+                    Map<String, String> reqBodyMap = new LinkedHashMap<>();
+                    reqBodyMap.put("username", tiUsername.getText().toString());
+                    reqBodyMap.put("password", tiPassword.getText().toString());
 
-                Gson gson = new Gson();
-                String json = gson.toJson(reqMap);
+                    // #2. Call API
+                    NetworkManager.sendToServer(LoginActivity.this, "/rest/v1/auth", reqBodyMap, new NetworkResponseListener() {
+                        @Override
+                        public void onFailure(Throwable throwable) {
+                            Log.e(TAG, "Login Error");
+                            // #3. Close progressbar
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    progressBar.setVisibility(View.GONE);
+                                }
+                            });
+                        }
 
-                RequestBody jsonBody = RequestBody.create(
-                        MediaType.parse(AppConstants.JSON_CONTENT_TYPE), json);
-
-                // #2. Create request with post
-                String url = BuildConfig.BASE_URL + "/rest/v1/auth";
-
-                Request request = new Request.Builder()
-                        .url(url)
-                        .post(jsonBody)
-                        .build();
-
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if(response.isSuccessful()){
-                            final String result = response.body().string();
-                            Gson gson = new Gson();
-                            Map map = gson.fromJson(result, Map.class);
-                            Log.d(TAG, "onResponse: " + map.toString());
-
+                        @Override
+                        public void onSuccess(Map<String, Object> resMap) {
+                            // #1. Save Access Token / Refresh Token
                             Map<String, String> sharedMap = new HashMap<String, String>();
-                            sharedMap.put(AppConstants.ACCESS_TOKEN_KEY, (String) map.get(AppConstants.ACCESS_TOKEN_KEY));
-                            sharedMap.put(AppConstants.REFRESH_TOKEN_KEY, (String) map.get(AppConstants.REFRESH_TOKEN_KEY));
+                            sharedMap.put(AppConstants.ACCESS_TOKEN_KEY, (String) resMap.get(AppConstants.ACCESS_TOKEN_KEY));
+                            sharedMap.put(AppConstants.REFRESH_TOKEN_KEY, (String) resMap.get(AppConstants.REFRESH_TOKEN_KEY));
                             PreferencesUtils.setPreferences(LoginActivity.this, sharedMap);
-
+                            // #2. Move to MainActivity
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
                             finish();
+                            // #3. Close progressbar
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    progressBar.setVisibility(View.GONE);
+                                }
+                            });
                         }
-                    }
-                });
-                // End - Call API
+                    });
+                }
 
-                progressBar.setVisibility(View.GONE);
+            }
+
+            /**
+             * Check Required Fields
+             */
+            private void checkRequiredField() {
+                if (TextUtils.isEmpty(tiUsername.getText())) {
+                    tiUsername.setError(getResources().getString(R.string.required_field_error, "Username"));
+                } else {
+                    tiUsername.setError(null);
+                }
+
+                if (TextUtils.isEmpty(tiPassword.getText())) {
+                    tiPassword.setError(getResources().getString(R.string.required_field_error, "Password"));
+                } else {
+                    tiPassword.setError(null);
+                }
             }
         });
     }
