@@ -77,7 +77,7 @@ public class NetworkManager {
      *
      * @return
      */
-    public static NetworkManager getInstance(Context context) {
+    public static synchronized NetworkManager getInstance(Context context) {
         if (instance == null) {
             instance = new NetworkManager(context);
         }

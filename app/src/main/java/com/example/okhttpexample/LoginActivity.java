@@ -34,6 +34,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // #1. Clear Shared Reference
+        clearSharedReferences();
+
         tiUsername = findViewById(R.id.tiUsername);
         tiPassword = findViewById(R.id.tiPassword);
         btnLogin = findViewById(R.id.btnLogin);
@@ -112,5 +115,16 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    /**
+     * Clear Shared References
+     * Access Token & Refresh Token
+     */
+    private void clearSharedReferences() {
+        Map<String, String> sharedMap = new HashMap<String, String>();
+        sharedMap.put(AppConstants.ACCESS_TOKEN_KEY, "");
+        sharedMap.put(AppConstants.REFRESH_TOKEN_KEY, "");
+        PreferencesUtils.setPreferences(LoginActivity.this, sharedMap);
     }
 }
