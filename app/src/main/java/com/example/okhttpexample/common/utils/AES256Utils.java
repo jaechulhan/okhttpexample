@@ -30,7 +30,7 @@ public class AES256Utils {
 
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, getIvParameterSpec());
-            return Base64.encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8)), Base64.URL_SAFE);
+            return Base64.encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8)), Base64.URL_SAFE | Base64.NO_WRAP);
         } catch (Exception e) {
             System.out.println("Error while encrypting: " + e.toString());
         }
@@ -51,7 +51,7 @@ public class AES256Utils {
 
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, secretKey, getIvParameterSpec());
-            return new String(cipher.doFinal(Base64.decode(strToDecrypt, Base64.URL_SAFE)));
+            return new String(cipher.doFinal(Base64.decode(strToDecrypt, Base64.URL_SAFE | Base64.NO_WRAP)));
         } catch (Exception e) {
             System.out.println("Error while decrypting: " + e.toString());
         }
